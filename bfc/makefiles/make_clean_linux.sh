@@ -1,7 +1,7 @@
 #!/bin/bash
 
 cd ../src
-rm -f *.ppu *.o
+rm -f *.ppu *.o gpc* dos* *.gpi
 cd ../tests
 rm *.s *.o t1 t2 t3 dump.*
 cd ../samples
