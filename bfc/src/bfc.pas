@@ -17,8 +17,9 @@ var
   opt_fname: string;
   opt_asm : boolean;
   opt_link : boolean;
-	bfc_home : string;
-	
+  bfc_home : string;
+  opt_c    : boolean;
+  
 procedure WriteLnq(s : string);
 begin
   if not opt_quiet then WriteLn(s);
@@ -48,6 +49,8 @@ end;
 
 
 procedure link;
+var
+   s : string;
 begin
   WriteLnq('Linking '+fname);
   {$IFDEF LINUX}
@@ -68,16 +71,22 @@ begin
   WriteLn('Usage: bfc {options} filename');
   WriteLn;
   WriteLn('Optionlist:');
-  WriteLn('   -q     be quiet');
-  WriteLn('   -c     compile only');
-  WriteLn('   -a     compile and assemble only');
+  WriteLn('   -q        be quiet');
+  WriteLn('   -c        compile only');
+  WriteLn('   -a        compile and assemble only');
+  WriteLn;
+  WriteLn('Target:');
+  WriteLn('   -tc       Create Ansi C File (compile only)');
+{  WriteLn('   -tlini386 Linux I386');
+  WriteLn('   -twin32   Win32');}
+
 {   WriteLn('   -sin   read from stdin');}
   halt;
 end;
 
 procedure print_info;
 begin
-  WriteLn('BFC Brainf*** compiler V[0.0.1] - 2002 by Bernd Boeckmann');
+  WriteLn('BFC Brainf*** compiler V[',BFC_VERSION_STR,'] - 2002 by Bernd Boeckmann');
   WriteLn('Send bugreports etc. to <bfc-devel@lists.berlios.de>');
   WriteLn;
 end;
@@ -92,7 +101,7 @@ begin
   opt_quiet := false;
   opt_asm := true;
   opt_link := true;
-
+  opt_c    := false;
   fname_set := false;
 
   for i := 1 to ParamCount do
@@ -105,6 +114,8 @@ begin
         else
           if ParamStr(i) = '-a' then opt_link := false
           else
+            if ParamStr(i) = '-tc' then opt_c := true
+            else
             begin
               opt_fname := ParamStr(i);
               fname_set := true;
@@ -113,6 +124,8 @@ begin
 
   if not fname_set then print_usage
   else fname := get_filename(opt_fname);
+  
+  if opt_c then emitter_set_target(EMITTER_C);
 end;
 
 procedure init;
@@ -125,7 +138,7 @@ begin
 		halt(1);
 	end;
 	{$IFDEF LINUX}
-		emitter_set_target(EMITTER_LINUX);
+		emitter_set_target(EMITTER_LINUX_i386);
 	{$ELSE}
 		emitter_set_target(EMITTER_WIN32);
 	{$ENDIF}
@@ -139,6 +152,8 @@ begin
   if not opt_quiet then print_info;
 
   compile;
+  if opt_c then halt(0);
+  
   if opt_asm then
   begin
     assemble;
