@@ -46,8 +46,6 @@ end;
 
 
 procedure link;
-var
-	s : string;
 begin
   WriteLnq('Linking '+fname);
   {$IFDEF LINUX}

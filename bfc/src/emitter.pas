@@ -83,13 +83,14 @@ begin
 {  WriteLn(fout, '   sub   eax, ', bf_data_size+bf_stack_size);}
   WriteLn(fout, '   call  bf_init');
   WriteLn(fout);
-  WriteLn(fout, '   movl  $DATA, %ebp');
+  WriteLn(fout, '   movl  $data, %ebp');
   WriteLn(fout, 'clear:');
   WriteLn(fout, '   movl  %ebp, %edi');
-  WriteLn(fout, '   addl  $', bf_data_size, ', %edi');
+{  WriteLn(fout, '   addl  $', bf_data_size, ', %edi');}
   WriteLn(fout, '   movl  $', bf_data_size div 4, ', %ecx');
   WriteLn(fout, '   xorl  %eax, %eax');
-  WriteLn(fout, '   std');
+{  WriteLn(fout, '   inc   %eax');}
+  WriteLn(fout, '   cld');
   WriteLn(fout, '   rep; stosl');
   WriteLn(fout);
   WriteLn(fout, 'main:');end;
@@ -125,8 +126,13 @@ begin
   WriteLn(fout);
   WriteLn(fout, '   call  bf_exit');
   WriteLn(fout);
+  WriteLn(fout, '.data');
+  WriteLn(fout, '.globl data_size');
+  WriteLn(fout, 'data_size:');
+  WriteLn(fout, '   .int ', bf_data_size);
+  WriteLn(fout);
   WriteLn(fout, '.bss');
-  WriteLn(fout, '   .comm DATA, ', bf_data_size);
+  WriteLn(fout, '   .comm data, ', bf_data_size);
 {  WriteLn(fout, 'stack:');
   WriteLn(fout, '   .comm STACK, ', bf_stack_size);
   WriteLn(fout, 'stack_end:');}
@@ -176,7 +182,7 @@ end;
 procedure emitter_dec_linux(n : integer);
 begin
   if n = 1 then WriteLn(fout, '   decl  %ebp')
-  else WriteLn(fout, '   subl   $',n,', %ebp');
+  else WriteLn(fout, '   subl  $',n,', %ebp');
 end;
 
 procedure emitter_dec_win32(n : integer);
