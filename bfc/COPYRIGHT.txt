@@ -1,0 +1,4 @@
+(c)opyright 2002 by Bernd Boeckmann
+
+See LICENSE.txt for LICENSE
+
