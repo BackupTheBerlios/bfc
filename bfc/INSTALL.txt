@@ -1,0 +1,20 @@
+Brainf*** Compiler Installation Notes
+
+LINUX:
+
+
+
+TO COMPILE BFC:
+
+FreePascal compiler is needed to compile BFC. You can get it from
+www.freepascal.org if it's not included in your distribution.
+
+- cd to {bfchome}/makefiles
+- run ./makefpc_linux.sh
+- run ./makelib_linux.sh
+
+Set BFC_HOME to the top of your BFC directory tree.
+Extend your path variable with $BFC_HOME/bin.
+
+run: bfc <sourcefile> to compile your BFC programs
+

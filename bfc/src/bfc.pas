@@ -5,6 +5,8 @@ program bfc;
 uses parser, bfcutil, emitter, dos;
 
 const
+  BFC_VERSION_STR = '0.0.9';
+  
   DATA_SIZE = 30000;
   STACK_SIZE = 4000;
 
@@ -60,8 +62,8 @@ end;
 
 procedure print_usage;
 begin
-  WriteLn('BFC Brainf*** compiler V[0.0.1] - 2002 by Bernd Boeckmann');
-  WriteLn('Send bugreports to <bboeckmann@gmx.de>');
+  WriteLn('BFC Brainf*** compiler V[',BFC_VERSION_STR,'] - 2002 by Bernd Boeckmann');
+  WriteLn('Send bugreports etc. to <bfc-devel@lists.berlios.de>');
   WriteLn;
   WriteLn('Usage: bfc {options} filename');
   WriteLn;
@@ -76,7 +78,7 @@ end;
 procedure print_info;
 begin
   WriteLn('BFC Brainf*** compiler V[0.0.1] - 2002 by Bernd Boeckmann');
-  WriteLn('Send bugreports to <bboeckmann@gmx.de>');
+  WriteLn('Send bugreports etc. to <bfc-devel@lists.berlios.de>');
   WriteLn;
 end;
 

@@ -1,0 +1,4 @@
+BFC Brainf*** Contributors:
+
+Programmers:
+    Bernd Boeckmann <bboeckmann@gmx.de>
