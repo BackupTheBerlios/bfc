@@ -88,13 +88,15 @@ procedure stmt_print;
 begin
   lexer_skip;
 
-  emitter_print;
+  emitter_push_data;
+  emitter_call('bf_print');
 end;
 
 procedure stmt_read;
 begin
   lexer_skip;
 
+  emitter_push_data_ptr;
   emitter_call('bf_read');
 end;
 

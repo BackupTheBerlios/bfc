@@ -2,7 +2,7 @@
 
 program bfc;
 
-uses parser, bfcutil, dos;
+uses parser, bfcutil, emitter, dos;
 
 const
   DATA_SIZE = 30000;
@@ -15,7 +15,6 @@ var
   opt_fname: string;
   opt_asm : boolean;
   opt_link : boolean;
-  opt_sin : boolean;
 	bfc_home : string;
 	
 procedure WriteLnq(s : string);
@@ -37,9 +36,12 @@ end;
 procedure assemble;
 begin
   WriteLnq('Assembling '+fname);
-{  exec('/usr/bin/nasm ', fname+'.asm -f elf');}
-
-  exec(GetEnv('COMSPEC'), '/C nasmw '+fname+'.asm -f win32');
+  {$IFDEF LINUX}
+{    exec(GetEnv('SHELL'), '-c "as '+fname+'.s -o '+fname+'.o"');}
+    exec('/usr/bin/as', fname+'.s -o '+fname+'.o');
+  {$ELSE}
+    exec(GetEnv('COMSPEC'), '/C nasmw '+fname+'.asm -f win32');
+  {$ENDIF}
 end;
 
 
@@ -48,11 +50,13 @@ var
 	s : string;
 begin
   WriteLnq('Linking '+fname);
-{  exec('/usr/bin/ld ', fname+'.o /home/bernd/bfc/lib/bflib_linux.o -o '+fname);}
-	s := '/C alink -c -oPE -m -subsys con -entry _start '+fname+' '+
+  {$IFDEF LINUX}
+    exec('/usr/bin/ld ', fname+'.o /home/bernd/bfc/lib/bflib_linux.o -o '+fname);
+  {$ELSE}
+    s := '/C alink -c -oPE -m -subsys con -entry _start '+fname+' '+
 					bfc_home+'\lib\bflib_win32.obj '+bfc_home+'\lib\win32.lib';
-				
-	exec(GetEnv('COMSPEC'), s);
+    exec(GetEnv('COMSPEC'), s);
+  {$ENDIF}
 end;
 
 
@@ -86,7 +90,6 @@ var
 
 begin
   opt_quiet := false;
-  opt_sin := false;
   opt_asm := true;
   opt_link := true;
 
@@ -102,8 +105,6 @@ begin
         else
           if ParamStr(i) = '-a' then opt_link := false
           else
-            if ParamStr(i) = '-sin' then opt_sin := true
-            else
             begin
               opt_fname := ParamStr(i);
               fname_set := true;
@@ -116,7 +117,6 @@ end;
 
 procedure init;
 begin
-{	emitter_set_syntax(EMITTER_GAS);}
 	bfc_home := GetEnv('BFC_HOME');
 	if bfc_home = '' then begin
 		WriteLn('Environment Variable BFC_HOME not set');
@@ -124,6 +124,11 @@ begin
 		WriteLn('Aborting...');
 		halt(1);
 	end;
+	{$IFDEF LINUX}
+		emitter_set_target(EMITTER_LINUX);
+	{$ELSE}
+		emitter_set_target(EMITTER_WIN32);
+	{$ENDIF}
 end;
 
 
