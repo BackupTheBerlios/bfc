@@ -2,7 +2,7 @@
 
 program bfc;
 
-uses parser, bfcutil, lindos;
+uses parser, bfcutil, dos;
 
 const
   DATA_SIZE = 30000;
@@ -16,7 +16,8 @@ var
   opt_asm : boolean;
   opt_link : boolean;
   opt_sin : boolean;
-
+	bfc_home : string;
+	
 procedure WriteLnq(s : string);
 begin
   if not opt_quiet then WriteLn(s);
@@ -36,15 +37,22 @@ end;
 procedure assemble;
 begin
   WriteLnq('Assembling '+fname);
-  exec('/usr/bin/nasm ', fname+'.asm -f elf');
+{  exec('/usr/bin/nasm ', fname+'.asm -f elf');}
+
+  exec(GetEnv('COMSPEC'), '/C nasmw '+fname+'.asm -f win32');
 end;
 
 
 procedure link;
+var
+	s : string;
 begin
   WriteLnq('Linking '+fname);
-  exec('/usr/bin/ld ', fname+'.o /home/bernd/bfc/lib/bflib_linux.o -o '+fname
-    );
+{  exec('/usr/bin/ld ', fname+'.o /home/bernd/bfc/lib/bflib_linux.o -o '+fname);}
+	s := '/C alink -c -oPE -m -subsys con -entry _start '+fname+' '+
+					bfc_home+'\lib\bflib_win32.obj '+bfc_home+'\lib\win32.lib';
+				
+	exec(GetEnv('COMSPEC'), s);
 end;
 
 
@@ -108,6 +116,14 @@ end;
 
 procedure init;
 begin
+{	emitter_set_syntax(EMITTER_GAS);}
+	bfc_home := GetEnv('BFC_HOME');
+	if bfc_home = '' then begin
+		WriteLn('Environment Variable BFC_HOME not set');
+		WriteLn;
+		WriteLn('Aborting...');
+		halt(1);
+	end;
 end;
 
 
